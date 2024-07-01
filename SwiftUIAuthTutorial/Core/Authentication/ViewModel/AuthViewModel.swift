@@ -65,5 +65,15 @@ class AuthViewModel: ObservableObject {
         self.currentUser = try? snapshot.data(as: User.self)
     }
     
-    
+    func deleteUser() async throws {
+        do {
+            guard let uid = Auth.auth().currentUser?.uid else { return }
+            try await Auth.auth().currentUser?.delete()
+            try await Firestore.firestore().collection("users").document(uid).delete()
+            self.currentUser = nil
+            self.userSession = nil
+        } catch {
+            print("DEBUG: Failed to delete user with error \(error.localizedDescription)")
+        }
+    }
 }
